@@ -1,0 +1,12 @@
+from pydantic import BaseModel
+
+
+class ItemCreate(BaseModel):
+    name: str
+
+
+class Item(BaseModel):
+    id: int
+    name: str
+
+    model_config = {"from_attributes": True}
