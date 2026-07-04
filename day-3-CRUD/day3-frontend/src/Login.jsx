@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function Login({ setToken }) {
   const [username, setUsername] = useState("");
@@ -13,7 +14,7 @@ function Login({ setToken }) {
     formData.append("username", username);
     formData.append("password", password);
 
-    const res = await fetch("http://127.0.0.1:8000/login", {
+    const res = await fetch(`${API_BASE_URL}/login`, {
       method: "POST",
       body: formData,
     });

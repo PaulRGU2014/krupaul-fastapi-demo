@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function ItemEdit () {
   const {id} = useParams();
@@ -8,7 +9,7 @@ function ItemEdit () {
   const navigate = useNavigate();
   
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/items/${id}`)
+    fetch(`${API_BASE_URL}/items/${id}`)
     .then((res) => {
       if (!res.ok) {
         throw new Error("Item not found");
@@ -32,7 +33,7 @@ function ItemEdit () {
       return;
     }
 
-    const res = await fetch(`http://127.0.0.1:8000/items/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/items/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"

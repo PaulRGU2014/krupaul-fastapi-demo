@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function ItemCreate() {
   const [name, setName] = useState("");
@@ -14,7 +15,7 @@ function ItemCreate() {
       return;
     }
 
-    const res = await fetch("http://127.0.0.1:8000/items", {
+    const res = await fetch(`${API_BASE_URL}/items`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),

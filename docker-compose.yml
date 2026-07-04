@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: paul
+      POSTGRES_PASSWORD: paulpass
+      POSTGRES_DB: itemsdb
+    ports:
+      - "5432:5432"
+    networks:
+      - appnet
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paul -d itemsdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./day-3-CRUD/backend
+    container_name: fastapi_backend
+    restart: on-failure
+    environment:
+      DATABASE_URL: postgresql://paul:paulpass@db:5432/itemsdb
+      SECRET_KEY: dev_only_secret_change_me
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - appnet
+
+  frontend:
+    build: ./day-3-CRUD/day3-frontend
+    container_name: react_frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+      - HOST=0.0.0.0
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - appnet
+
+networks:
+  appnet:
+
+volumes:
+  db_data:

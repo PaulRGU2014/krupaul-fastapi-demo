@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function ItemDetail() {
   const { id } = useParams();
@@ -7,7 +8,7 @@ function ItemDetail() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/items/${id}`)
+    fetch(`${API_BASE_URL}/items/${id}`)
     .then((res) => {
       if (res.status === 404) {
         throw new Error("Item not found");
