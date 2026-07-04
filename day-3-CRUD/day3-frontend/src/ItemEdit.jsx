@@ -20,7 +20,7 @@ function ItemEdit () {
       setName(data.name);
     })
     .catch(() => {
-      setError("Unable to load ite,")
+      setError("Unable to load item")
     })
   }, [id]);
 
@@ -61,7 +61,6 @@ function ItemEdit () {
           />
         </label>
         <button type="submit">Update</button>
-        {error && <p style={{color: "red"}}>{error}</p>}
       </form>
     </div>
   ); 
