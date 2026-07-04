@@ -1,70 +1,138 @@
-# Getting Started with Create React App
+# Day 3 CRUD Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project contains:
 
-## Available Scripts
+1. FastAPI backend with authentication and CRUD endpoints
+2. React frontend for login, registration, and item management
+3. Docker Compose setup for full local stack
+4. Kubernetes manifests for deployment practice
 
-In the project directory, you can run:
+## Project Structure
 
-### `npm start`
+1. Backend: ../backend
+2. Frontend: .
+3. Docker Compose: ../../docker-compose.yml
+4. Kubernetes manifests:
+	- fastapi-deployment.yaml
+	- fastapi-service.yaml
+	- fastapi-secret.yaml
+	- postgres-deployment.yaml
+	- postgres-service.yaml
+	- postgres-secret.yaml
+	- postgres-pvc.yaml
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Run Locally Without Docker
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Backend
 
-### `npm test`
+From repository root:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. source .venv/bin/activate
+2. cd day-3-CRUD
+3. python -m uvicorn backend.main:app --reload --port 8000
 
-### `npm run build`
+Backend URLs:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. API base: http://127.0.0.1:8000
+2. Swagger docs: http://127.0.0.1:8000/docs
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Frontend
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+In a separate terminal:
 
-### `npm run eject`
+1. cd day-3-CRUD/day3-frontend
+2. npm install
+3. npm start
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Frontend URL:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. http://127.0.0.1:3000
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Run With Docker Compose
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+From repository root:
 
-## Learn More
+1. docker compose up --build -d
+2. docker compose ps
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Open:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Frontend: http://127.0.0.1:3000
+2. Backend docs: http://127.0.0.1:8000/docs
 
-### Code Splitting
+Stop stack:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. docker compose down
 
-### Analyzing the Bundle Size
+## How Backend Works
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Main backend modules:
 
-### Making a Progressive Web App
+1. main.py
+	- Defines API routes
+	- Creates tables on startup
+	- Configures CORS middleware
+2. database.py
+	- Builds SQLAlchemy engine and session factory
+	- Uses DATABASE_URL from environment, with sqlite fallback
+3. models.py
+	- SQLAlchemy models for User and Item
+4. schemas.py
+	- Pydantic request and response models
+5. security.py
+	- Password hashing and verification using passlib
+6. auth.py
+	- JWT token creation and expiration handling
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Authentication flow:
 
-### Advanced Configuration
+1. Register with POST /register using JSON body with username and password
+2. Login with POST /login using form-data fields username and password
+3. Backend returns access_token and token_type
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Current item endpoints:
 
-### Deployment
+1. POST /items
+2. GET /items
+3. GET /items/{item_id}
+4. PUT /items/{item_id}
+5. DELETE /items/{item_id}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Note: Authentication is implemented and token generation works, but item routes are currently not protected by token validation dependency.
 
-### `npm run build` fails to minify
+## Environment Variables
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Backend variables:
+
+1. DATABASE_URL
+2. SECRET_KEY
+
+Frontend variable:
+
+1. REACT_APP_API_URL
+
+## Kubernetes Deployment Notes
+
+This folder includes Kubernetes manifests for FastAPI and Postgres.
+
+Typical apply order:
+
+1. kubectl apply -f postgres-secret.yaml
+2. kubectl apply -f postgres-pvc.yaml
+3. kubectl apply -f postgres-deployment.yaml
+4. kubectl apply -f postgres-service.yaml
+5. kubectl apply -f fastapi-secret.yaml
+6. kubectl apply -f fastapi-deployment.yaml
+7. kubectl apply -f fastapi-service.yaml
+
+Before applying in a real cluster:
+
+1. Update container image in fastapi-deployment.yaml
+2. Replace secret values in fastapi-secret.yaml
+
+## Useful Commands
+
+1. Frontend build: npm run build
+2. Docker logs backend: docker compose logs backend --tail=100
+3. Docker logs frontend: docker compose logs frontend --tail=100
+4. Docker status: docker compose ps
